@@ -1,13 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 import { Context } from "../../main";
+
 const JobDetails = () => {
   const { id } = useParams();
   const [job, setJob] = useState({});
   const navigateTo = useNavigate();
-
   const { isAuthorized, user } = useContext(Context);
 
   useEffect(() => {
@@ -18,55 +17,61 @@ const JobDetails = () => {
       .then((res) => {
         setJob(res.data.job);
       })
-      .catch((error) => {
+      .catch(() => {
         navigateTo("/notfound");
       });
-  }, []);
+  }, [id, navigateTo]);
 
   if (!isAuthorized) {
     navigateTo("/login");
   }
 
   return (
-    <section className="jobDetail page">
-      <div className="container">
-        <h3>Job Details</h3>
-        <div className="banner">
-          <p>
-            Title: <span> {job.title}</span>
+    <section className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="bg-white shadow-lg rounded-lg p-8 max-w-2xl w-full mx-4">
+        <h3 className="text-3xl font-bold text-gray-800 mb-6 text-center">Job Details</h3>
+        <div className="space-y-4">
+          <p className="text-lg">
+            <strong>Title:</strong> <span className="text-blue-600">{job.title}</span>
           </p>
           <p>
-            Category: <span>{job.category}</span>
+            <strong>Category:</strong> <span className="text-gray-700">{job.category}</span>
           </p>
           <p>
-            Country: <span>{job.country}</span>
+            <strong>Country:</strong> <span className="text-gray-700">{job.country}</span>
           </p>
           <p>
-            City: <span>{job.city}</span>
+            <strong>City:</strong> <span className="text-gray-700">{job.city}</span>
           </p>
           <p>
-            Location: <span>{job.location}</span>
+            <strong>Location:</strong> <span className="text-gray-700">{job.location}</span>
           </p>
           <p>
-            Description: <span>{job.description}</span>
+            <strong>Description:</strong> <span className="text-gray-700">{job.description}</span>
           </p>
           <p>
-            Job Posted On: <span>{job.jobPostedOn}</span>
+            <strong>Job Posted On:</strong> <span className="text-gray-700">{job.jobPostedOn}</span>
           </p>
           <p>
-            Salary:{" "}
+            <strong>Salary:</strong>{" "}
             {job.fixedSalary ? (
-              <span>{job.fixedSalary}</span>
+              <span className="text-green-600 font-semibold">{job.fixedSalary}</span>
             ) : (
-              <span>
+              <span className="text-green-600 font-semibold">
                 {job.salaryFrom} - {job.salaryTo}
               </span>
             )}
           </p>
-          {user && user.role === "Employer" ? (
-            <></>
-          ) : (
-            <Link to={`/application/${job._id}`}>Apply Now</Link>
+
+          {user && user.role !== "Employer" && (
+            <div className="text-center mt-6">
+              <Link
+                to={`/application/${job._id}`}
+                className="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 transition"
+              >
+                Apply Now
+              </Link>
+            </div>
           )}
         </div>
       </div>
